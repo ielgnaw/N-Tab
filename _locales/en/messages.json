@@ -86,12 +86,6 @@
 	"pullFromGithubGist": {
 		"message": "Pull From GitHub's gist"
 	},
-	"pushToGiteeGist": {
-		"message": "Push To Gitee's gist"
-	},
-	"pullFromGiteeGist": {
-		"message": "Pull From Gitee's gist"
-	},
 	"confirmKey": {
 		"message": "Please input \"confirm\" to ensure: "
 	},
@@ -122,20 +116,11 @@
 	"githubApiStatusSuccess": {
 		"message": "GitHub API status : SUCCESS"
 	},
-	"giteeApiStatusSuccess": {
-		"message": "Gitee API status : SUCCESS"
-	},
 	"githubApiStatusFailed": {
 		"message": "GitHub API status : FAILED"
 	},
-	"giteeApiStatusFailed": {
-		"message": "Gitee API status : FAILED"
-	},
 	"githubApiStatusError": {
 		"message": "GitHub API status : ERROR"
-	},
-	"giteeApiStatusError": {
-		"message": "Gitee API status : ERROR"
 	},
 	"yes": {
 		"message": "yes"
@@ -149,35 +134,17 @@
 	"pullFromGithubGistIng": {
 		"message": "pull from GitHub's Gist ing, please wait!"
 	},
-	"pushToGiteeGistIng": {
-		"message": "push to Gitee's Gist ing, please wait!"
-	},
-	"pullFromGiteeGistIng": {
-		"message": "pull from Gitee's Gist ing, please wait!"
-	},
 	"startPushToGithubGistTask": {
 		"message": "start push to GitHub's gist task"
 	},
 	"startPullFromGithubGistTask": {
 		"message": "start pull from GitHub's gist task"
 	},
-	"startPushToGiteeGistTask": {
-		"message": "start push to Gitee's gist task"
-	},
-	"startPullFromGiteeGistTask": {
-		"message": "start pull from Gitee's gist task"
-	},
 	"endPushToGithubGistTask": {
 		"message": "push to GitHub's gist task end"
 	},
 	"endPullFromGithubGistTask": {
 		"message": "pull from GitHub's gist task end"
-	},
-	"endPushToGiteeGistTask": {
-		"message": "push to Gitee's gist task end"
-	},
-	"endPullFromGiteeGistTask": {
-		"message": "pull from Gitee's gist task end"
 	},
 	"clickPushToGithubGist": {
 		"message": "click push to GitHub's gist"
@@ -188,32 +155,14 @@
 	"clickPullFromGithubGist": {
 		"message": "click pull from GitHub's gist"
 	},
-	"clickPushToGiteeGist": {
-		"message": "click push to Gitee's gist"
-	},
-	"autoPushToGiteeGist": {
-		"message": "auto push to Gitee's gist"
-	},
-	"clickPullFromGiteeGist": {
-		"message": "click pull from Gitee's gist"
-	},
 	"startCheckGithubTokenSaved": {
 		"message": "start check GitHub token is saved ?"
-	},
-	"startCheckGiteeTokenSaved": {
-		"message": "start check Gitee token is saved ?"
 	},
 	"githubTokenSaved": {
 		"message": "GitHub token had saved"
 	},
-	"giteeTokenSaved": {
-		"message": "Gitee token had saved"
-	},
 	"githubTokenNoSaved": {
 		"message": "GitHub token had not saved"
-	},
-	"giteeTokenNoSaved": {
-		"message": "Gitee token had not saved"
 	},
 	"saveTokenKey": {
 		"message": "please input token:"
@@ -223,9 +172,6 @@
 	},
 	"githubTokenSaveSuccess": {
 		"message": "GitHub token save success!"
-	},
-	"giteeTokenSaveSuccess": {
-		"message": "Gitee token save success!"
 	},
 	"startCheckGistIdSaved": {
 		"message": "start check gistId is saved ?"
@@ -263,9 +209,6 @@
 	"startCreateGithubGist": {
 		"message": "had not created gist, start create GitHub gist now!"
 	},
-	"startCreateGiteeGist": {
-		"message": "had not created gist, start create Gitee gist now!"
-	},
 	"createSuccess": {
 		"message": " create success"
 	},
@@ -277,9 +220,6 @@
 	},
 	"getGithubGistByRawUrl": {
 		"message": "be truncated, get GitHub's gist by raw_url"
-	},
-	"getGiteeGistById": {
-		"message": "get Gitee's gist by gistId"
 	},
 	"pullSuccess": {
 		"message": "pull gist success"
@@ -302,15 +242,6 @@
 	"clickPullGithub": {
 		"message": "CLICK TO PULL FROM GitHub'S GIST"
 	},
-	"clickPushGitee": {
-		"message": "CLICK TO PUSH TO Gitee'S GIST"
-	},
-	"autoPushGitee": {
-		"message": "AUTO PUSH TO Gitee'S GIST"
-	},
-	"clickPullGitee": {
-		"message": "CLICK TO PULL FROM Gitee'S GIST"
-	},
 	"waitForMinutes": {
 		"message": "minute wait for"
 	},
@@ -328,9 +259,6 @@
 	},
 	"seconds": {
 		"message": " second "
-	},
-	"sourceCode": {
-		"message": "The source code for N-Tab is available at "
 	},
 	"usedSpace": {
 		"message": "UsedSpace : "
@@ -407,9 +335,6 @@
 	"githubToken": {
 		"message": "GitHub Token"
 	},
-	"giteeToken": {
-		"message": "Gitee Token"
-	},
 	"input": {
 		"message": "Please input "
 	},
@@ -418,12 +343,6 @@
 	},
 	"group": {
 		"message": " group"
-	},
-	"contract": {
-		"message": "If you have any questions, you can directly contact WeChat : scoful. Please state your source and purpose~"
-	},
-	"donate": {
-		"message": "Buy Me A Coffee"
 	},
 	"cannotDelete": {
 		"message": "Cannot delete while in locked state."

@@ -1,6 +1,6 @@
 {
-    "version": "3.1.0",
-    "name": "N-Tab",
+    "version": "1.0.0",
+    "name": "ielgnaw-N-Tab",
     "manifest_version": 3,
     "description": "__MSG_pluginDesc__",
     "background": {
@@ -25,11 +25,11 @@
         "<all_urls>"
     ],
     "content_security_policy": {
-      "sandbox": "sandbox allow-scripts; script-src 'self' https://api.github.com https://gitee.com https://hm.baidu.com 'unsafe-eval' https://hmcdn.baidu.com; object-src 'self'"
+      "sandbox": "sandbox allow-scripts; script-src 'self' https://api.github.com https://hm.baidu.com 'unsafe-eval' https://hmcdn.baidu.com; object-src 'self'"
     },
     "action": {
         "default_icon": "images/96.png",
-        "default_title": "N-Tab",
+        "default_title": "ielgnaw-N-Tab",
         "default_popup": "popup.html"
     },
     "content_scripts": [

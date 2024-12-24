@@ -1,15 +1,10 @@
 ;(function (m) {
     'use strict';
     let githubGistToken;
-    let giteeGistToken;
     let githubGistId;
-    let giteeGistId;
     let gitHubApiUrl = "https://api.github.com";
-    let giteeApiUrl = "https://gitee.com/api/v5";
     let pushToGithubGistStatus;
     let pullFromGithubGistStatus;
-    let pushToGiteeGistStatus;
-    let pullFromGiteeGistStatus;
     let handleGistLog = [];
     let sortableTitle;
     let sortableTabList = [];
@@ -27,6 +22,7 @@
     let isStateOne = true;
 
     document.addEventListener('DOMContentLoaded', function () {
+        debugger;
         console.log("load完workbench了");
 
         // 获取本机storage
@@ -55,7 +51,7 @@
                         <span class="icon-bar"></span>
                         <span class="icon-bar"></span>
                     </button>
-                    <a class="navbar-brand" href="#home">N-Tab</a>
+                    <a class="navbar-brand" href="#home">ielgnaw-N-Tab</a>
                 </div>
                 <div id="navbar" class="navbar-collapse collapse">
                     <ul class="nav navbar-nav">
@@ -73,11 +69,6 @@
                                 </li>
                                 <li id="pullFromGithubGist"><a
                                         href="#">${chrome.i18n.getMessage("pullFromGithubGist")}</a></li>
-                                <li role="separator" class="divider"></li>
-                                <li id="pushToGiteeGist"><a href="#">${chrome.i18n.getMessage("pushToGiteeGist")}</a>
-                                </li>
-                                <li id="pullFromGiteeGist"><a
-                                        href="#">${chrome.i18n.getMessage("pullFromGiteeGist")}</a></li>
                                 <li role="separator" class="divider"></li>
                                 <li><a href="#">${chrome.i18n.getMessage("autoSync")} <input id="autoSync"
                                             data-size="mini" type="checkbox"></a></li>
@@ -105,20 +96,6 @@
                         </li>
                         <li>
                             <a><span id="usage"></span></a>
-                        </li>
-                        <li class="dropdown">
-                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button"
-                                aria-haspopup="true" aria-expanded="false"><span class="glyphicon glyphicon-heart"></span> ${chrome.i18n.getMessage("donate")}<span class="caret"></span></a>
-                            <ul id="others" class="dropdown-menu">
-                                <li>
-                                    <img src="https://scoful-picgo.oss-ap-southeast-1.aliyuncs.com/picgo/wx.jpg">
-                                </li>
-                                <li role="separator" class="divider"></li>
-                                <li>
-                                    <img src="https://scoful-picgo.oss-ap-southeast-1.aliyuncs.com/picgo/zfb.jpg">
-                                </li>
-                                    
-                            </ul>
                         </li>
                     </ul>
                 </div>
@@ -177,10 +154,6 @@ https://www.google.com | Google
             <a href="#top" class="btn btn-primary fixed-bottom-right">${chrome.i18n.getMessage("backToTop")}</a>
             <hr>
             <div class="blog-footer">
-            <p>${chrome.i18n.getMessage("sourceCode")}<a
-                    href="https://github.com/scoful/cloudSkyMonster">GitHub</a>.</p>
-            <p>${chrome.i18n.getMessage("contract")}</p>
-            <hr>
             </div>
         </div>
 
@@ -586,43 +559,6 @@ https://www.google.com | Google
             }
         });
 
-        // 响应推送到gitee的gist的动作
-        document.getElementById('pushToGiteeGist').addEventListener('click', function () {
-            let confirm = prompt(`${chrome.i18n.getMessage("confirmKey")}`, `${chrome.i18n.getMessage("confirmValue")}`);
-            if (confirm.trim() === "确定" || confirm.trim() === "confirm") {
-                console.log("yes");
-                chrome.storage.local.get(null, function (storage) {
-                    if (!storage.giteeGistToken) {
-                        console.log("giteeGistToken没有保存");
-                        showAlert(`${chrome.i18n.getMessage("showError")}`, `${chrome.i18n.getMessage("giteeTokenNoSaved")}` + "\n" + `${chrome.i18n.getMessage("goToOptions")}`)
-                        return
-                    }
-                    console.log(storage.handleGistStatus);
-                    if (storage.handleGistStatus) {
-                        console.log("handleGistStatus有值");
-                        if (storage.handleGistStatus.type === "IDLE") {
-                            pushToGiteeGist();
-                        } else {
-                            let time = moment().format('YYYY-MM-DD HH:mm:ss');
-                            let expireTime = storage.handleGistStatus.expireTime;
-                            console.log(expireTime)
-                            if (time > expireTime) {
-                                pushToGiteeGist();
-                            } else {
-                                alert(storage.handleGistStatus.type);
-                            }
-                        }
-                    } else {
-                        console.log("handleGistStatus没有值，第一次");
-                        pushToGiteeGist();
-                    }
-                });
-            } else {
-                console.log("no");
-                showAlert(`${chrome.i18n.getMessage("showError")}`, `${chrome.i18n.getMessage("importTextareaTip")}`)
-            }
-        });
-
         // 响应从github的gist拉取的动作
         document.getElementById('pullFromGithubGist').addEventListener('click', function () {
             let confirm = prompt(`${chrome.i18n.getMessage("confirmKey")}`, `${chrome.i18n.getMessage("confirmValue")}`);
@@ -652,43 +588,6 @@ https://www.google.com | Google
                     } else {
                         console.log("handleGistStatus没有值，第一次");
                         pullFromGithubGist();
-                    }
-                });
-            } else {
-                console.log("no");
-                showAlert(`${chrome.i18n.getMessage("showError")}`, `${chrome.i18n.getMessage("importTextareaTip")}`)
-            }
-        });
-
-        // 响应从gitee的gist拉取的动作
-        document.getElementById('pullFromGiteeGist').addEventListener('click', function () {
-            let confirm = prompt(`${chrome.i18n.getMessage("confirmKey")}`, `${chrome.i18n.getMessage("confirmValue")}`);
-            if (confirm.trim() === "确定" || confirm.trim() === "confirm") {
-                console.log("yes");
-                chrome.storage.local.get(null, function (storage) {
-                    if (!storage.giteeGistToken) {
-                        console.log("giteeGistToken没有保存");
-                        showAlert(`${chrome.i18n.getMessage("showError")}`, `${chrome.i18n.getMessage("giteeTokenNoSaved")}` + "\n" + `${chrome.i18n.getMessage("goToOptions")}`)
-                        return
-                    }
-                    console.log(storage.handleGistStatus);
-                    if (storage.handleGistStatus) {
-                        console.log("handleGistStatus有值");
-                        if (storage.handleGistStatus.type === "IDLE") {
-                            pullFromGiteeGist();
-                        } else {
-                            let time = moment().format('YYYY-MM-DD HH:mm:ss');
-                            let expireTime = storage.handleGistStatus.expireTime;
-                            console.log(expireTime)
-                            if (time > expireTime) {
-                                pullFromGiteeGist();
-                            } else {
-                                alert(storage.handleGistStatus.type);
-                            }
-                        }
-                    } else {
-                        console.log("handleGistStatus没有值，第一次");
-                        pullFromGiteeGist();
                     }
                 });
             } else {
@@ -846,49 +745,6 @@ https://www.google.com | Google
         }
     }
 
-    // 从gitee的gist拉取
-    function pullFromGiteeGist() {
-        startTime = moment();
-        setHandleGistStatus(`${chrome.i18n.getMessage("pullFromGiteeGistIng")}`);
-        handleGistLog.length = 0;
-        usedSeconds = 0;
-        handleGistLog.push(`${chrome.i18n.getMessage("start")}${moment().format('YYYY-MM-DD HH:mm:ss')}`);
-        handleGistLog.push(`${chrome.i18n.getMessage("clickPullFromGiteeGist")}`)
-        console.log(pullFromGiteeGistStatus);
-        pullFromGiteeGistStatus = `${chrome.i18n.getMessage("startPullFromGiteeGistTask")}`;
-        console.log("开始pull从gitee的gist的任务");
-        handleGistLog.push(`${chrome.i18n.getMessage("startPullFromGiteeGistTask")}`)
-        if (typeof (pullFromGiteeGistStatus) != "undefined") {
-            console.log("开始工作");
-            intervalId = setInterval(function () {
-                if (typeof (pullFromGiteeGistStatus) != "undefined") {
-                    console.log("秒等待");
-                    usedSeconds++;
-                } else {
-                    clearInterval(intervalId);
-                    endTime = moment();
-                    const duration = moment.duration(moment(endTime).diff(moment(startTime)));
-                    notificationId = genObjectId();
-                    chrome.notifications.create(notificationId, {
-                        type: 'basic',
-                        iconUrl: 'images/128.png',
-                        title: `${chrome.i18n.getMessage("endPullFromGiteeGistTask")}`,
-                        message: `${chrome.i18n.getMessage("usedTime")}${duration.hours()}${chrome.i18n.getMessage("hours")}${duration.minutes()}${chrome.i18n.getMessage("minutes")}${duration.seconds()}${chrome.i18n.getMessage("seconds")}`,
-                        buttons: [{"title": `${chrome.i18n.getMessage("close")}`}],
-                        requireInteraction: true
-                    });
-                    handleGistLog.push(`${usedSeconds}${chrome.i18n.getMessage("secondWait")}`)
-                    handleGistLog.push(`${chrome.i18n.getMessage("endPullFromGiteeGistTask")}`)
-                    handleGistLog.push(`${chrome.i18n.getMessage("end")}${moment().format('YYYY-MM-DD HH:mm:ss')}`);
-                    setHandleGistStatus("IDLE");
-                    setHandleGistLog(`${chrome.i18n.getMessage("clickPullGitee")}`, true);
-                    console.log("pull从gitee的gist的任务完成");
-                }
-            }, 1000);
-            isStoredGiteeTokenLocal("pull_gitee");
-        }
-    }
-
     // 推送到github的gist
     function pushToGithubGist() {
         startTime = moment();
@@ -930,50 +786,6 @@ https://www.google.com | Google
                 }
             }, 1000);
             isStoredGithubTokenLocal("push_github");
-        }
-    }
-
-    // 推送到gitee的gist
-    function pushToGiteeGist() {
-        startTime = moment();
-        setHandleGistStatus(`${chrome.i18n.getMessage("pushToGiteeGistIng")}`);
-        handleGistLog.length = 0;
-        usedSeconds = 0;
-        handleGistLog.push(`${chrome.i18n.getMessage("start")}${moment().format('YYYY-MM-DD HH:mm:ss')}`);
-        handleGistLog.push(`${chrome.i18n.getMessage("clickPushToGiteeGist")}`)
-        console.log(pushToGiteeGistStatus);
-        pushToGiteeGistStatus = `${chrome.i18n.getMessage("startPushToGiteeGistTask")}`;
-        console.log(pushToGiteeGistStatus);
-        console.log("开始push到gitee的gist的任务");
-        handleGistLog.push(`${chrome.i18n.getMessage("startPushToGiteeGistTask")}`)
-        if (typeof (pushToGiteeGistStatus) != "undefined") {
-            console.log("开始工作");
-            intervalId = setInterval(function () {
-                if (typeof (pushToGiteeGistStatus) != "undefined") {
-                    console.log("秒等待");
-                    usedSeconds++;
-                } else {
-                    clearInterval(intervalId);
-                    endTime = moment();
-                    const duration = moment.duration(moment(endTime).diff(moment(startTime)));
-                    notificationId = genObjectId();
-                    chrome.notifications.create(notificationId, {
-                        type: 'basic',
-                        iconUrl: 'images/128.png',
-                        title: `${chrome.i18n.getMessage("endPushToGiteeGistTask")}`,
-                        message: `${chrome.i18n.getMessage("usedTime")}${duration.hours()}${chrome.i18n.getMessage("hours")}${duration.minutes()}${chrome.i18n.getMessage("minutes")}${duration.seconds()}${chrome.i18n.getMessage("seconds")}`,
-                        buttons: [{"title": `${chrome.i18n.getMessage("close")}`}],
-                        requireInteraction: true
-                    });
-                    handleGistLog.push(`${usedSeconds}${chrome.i18n.getMessage("secondWait")}`)
-                    handleGistLog.push(`${chrome.i18n.getMessage("endPushToGiteeGistTask")}`)
-                    handleGistLog.push(`${chrome.i18n.getMessage("end")}${moment().format('YYYY-MM-DD HH:mm:ss')}`);
-                    setHandleGistStatus("IDLE");
-                    setHandleGistLog(`${chrome.i18n.getMessage("clickPushGitee")}`, false);
-                    console.log("push到gitee的gist的任务完成");
-                }
-            }, 1000);
-            isStoredGiteeTokenLocal("push_gitee");
         }
     }
 
@@ -1063,45 +875,6 @@ https://www.google.com | Google
         })
     }
 
-    // 更新gitee的gist
-    function updateGiteeGist(content) {
-        pushToGiteeGistStatus = `${chrome.i18n.getMessage("directUpdate")}`;
-        handleGistLog.push(`${chrome.i18n.getMessage("directUpdate")}`)
-        console.log("已经创建了gist，直接开始更新");
-        let _content = JSON.stringify(content);
-        let data = {
-            "description": "myCloudSkyMonster", "public": false, "files": {
-                "brower_Tabs.json": {"content": _content}
-            }
-        }
-        $.ajax({
-            type: "PATCH",
-            headers: {"Authorization": "token " + giteeGistToken},
-            url: giteeApiUrl + "/gists/" + giteeGistId,
-            data: data,
-            success: function (data, status) {
-                if (status === "success") {
-                    console.log("更新成功！");
-                    handleGistLog.push(`${chrome.i18n.getMessage("updateSuccess")}`)
-                } else {
-                    console.log("更新失败！");
-                    handleGistLog.push(`${chrome.i18n.getMessage("updateFailed")}`)
-                }
-            },
-            error: function (xhr, errorText, errorType) {
-                console.log(xhr);
-                console.log(errorText);
-                console.log(errorType);
-                console.log("报错了！");
-                handleGistLog.push(`${chrome.i18n.getMessage("updateFailed")}-->${xhr.responseText}`)
-            },
-            complete: function () {
-                //do something
-                pushToGiteeGistStatus = undefined;
-            }
-        })
-    }
-
     // 判断是否已经保存了github的gistId
     function isStoredGithubGistIdLocal(action) {
         console.log("开始检查gistId有没有保存");
@@ -1133,41 +906,6 @@ https://www.google.com | Google
                 console.log("gistId没有保存");
                 handleGistLog.push(`${chrome.i18n.getMessage("gistIdNoSaved")}`)
                 isHadCreateGithubGist(action);
-            }
-        });
-    }
-
-    // 判断是否已经保存了gitee的gistId
-    function isStoredGiteeGistIdLocal(action) {
-        console.log("开始检查gistId有没有保存");
-        handleGistLog.push(`${chrome.i18n.getMessage("startCheckGistIdSaved")}`)
-        if (action === "push_gitee") {
-            pushToGiteeGistStatus = `${chrome.i18n.getMessage("startCheckGistIdSaved")}`;
-        } else if (action === "pull_gitee") {
-            pullFromGiteeGistStatus = `${chrome.i18n.getMessage("startCheckGistIdSaved")}`;
-        }
-        chrome.storage.local.get("giteeGistId", function (storage) {
-            console.log(storage.giteeGistId);
-            if (storage.giteeGistId) {
-                console.log("gistId有保存");
-                handleGistLog.push(`${chrome.i18n.getMessage("gistIdSaved")}`)
-                giteeGistId = storage.giteeGistId;
-                if (action === "push_gitee") {
-                    getShardings(function (callback) {
-                        if (!callback || typeof callback == 'undefined') {
-                            console.log("本地storage里没有内容");
-                            updateGiteeGist([]);
-                        } else {
-                            updateGiteeGist(callback);
-                        }
-                    })
-                } else if (action === "pull_gitee") {
-                    getGiteeGistById();
-                }
-            } else {
-                console.log("gistId没有保存");
-                handleGistLog.push(`${chrome.i18n.getMessage("gistIdNoSaved")}`)
-                isHadCreateGiteeGist(action);
             }
         });
     }
@@ -1239,117 +977,6 @@ https://www.google.com | Google
             complete: function () {
                 //do something
                 pullFromGithubGistStatus = undefined;
-            }
-        })
-    }
-
-    // 通过gistId获取gitee gist
-    function getGiteeGistById() {
-        console.log("根据gistId拉取gist");
-        handleGistLog.push(`${chrome.i18n.getMessage("getGiteeGistById")}`)
-        pullFromGiteeGistStatus = `${chrome.i18n.getMessage("getGiteeGistById")}`;
-        $.ajax({
-            type: "GET",
-            headers: {"Authorization": "token " + giteeGistToken},
-            url: giteeApiUrl + "/gists/" + giteeGistId,
-            success: function (data, status) {
-                if (status === "success") {
-                    let content = data.files['brower_Tabs.json'].content
-                    let _content = JSON.parse(content)
-                    saveShardings(_content.tabGroups, "object");
-                    saveShardings(_content.delTabGroups, "del");
-                    handleGistLog.push(`${chrome.i18n.getMessage("pullSuccess")}`)
-                } else {
-                    alert("根据gistId拉取gist失败了");
-                    handleGistLog.push(`${chrome.i18n.getMessage("pullFailed")}`)
-                }
-            },
-            error: function (xhr, errorText, errorType) {
-                alert("根据gistId拉取gist报错了");
-                handleGistLog.push(`${chrome.i18n.getMessage("pullFailed")}-->${xhr.responseText}`)
-            },
-            complete: function () {
-                //do something
-                pullFromGiteeGistStatus = undefined;
-            }
-        })
-    }
-
-    // 判断是否已经创建了gitee的gist
-    function isHadCreateGiteeGist(action) {
-        console.log("检查是否已经创建了gist");
-        handleGistLog.push(`${chrome.i18n.getMessage("startCheckGistCreated")}`)
-        if (action === "push_gitee") {
-            pushToGiteeGistStatus = `${chrome.i18n.getMessage("startCheckGistCreated")}`;
-        } else if (action === "pull_gitee") {
-            pullFromGiteeGistStatus = `${chrome.i18n.getMessage("startCheckGistCreated")}`;
-        }
-        $.ajax({
-            type: "GET",
-            headers: {"Authorization": "token " + giteeGistToken},
-            url: giteeApiUrl + "/gists",
-            success: function (data, status) {
-                if (status === "success") {
-                    console.log("查到所有gists！");
-                    let i;
-                    let flag;
-                    for (i = 0; i < data.length; i += 1) {
-                        if (data[i].description === "myCloudSkyMonster") {
-                            console.log("已经创建了gist");
-                            handleGistLog.push(`${chrome.i18n.getMessage("gistCreated")}`)
-                            giteeGistId = data[i].id;
-                            chrome.storage.local.set({giteeGistId: data[i].id});
-                            handleGistLog.push(`${chrome.i18n.getMessage("getGistIdAndSaved")}`)
-                            console.log("获取gistId并保存完毕");
-                            console.log(giteeGistId);
-                            flag = true;
-                            break
-                        } else {
-                            console.log("还没有创建gist");
-                            flag = false;
-                        }
-                    }
-                    if (!flag) {
-                        handleGistLog.push(`${chrome.i18n.getMessage("gistNoCreated")}`)
-                        if (action === "push_gitee") {
-                            getShardings(function (callback) {
-                                if (!callback || typeof callback == 'undefined') {
-                                    console.log("本地storage里没有内容");
-                                    createGiteeGist([]);
-                                } else {
-                                    createGiteeGist(callback);
-                                }
-                            })
-                        } else if (action === "pull_gitee") {
-                            console.log("还没有创建gist,没有内容可以拉,结束任务");
-                            handleGistLog.push(`${chrome.i18n.getMessage("noGistCreatedAndOver")}`)
-                            pullFromGiteeGistStatus = undefined;
-                        }
-                    } else {
-                        if (action === "push_gitee") {
-                            getShardings(function (callback) {
-                                if (!callback || typeof callback == 'undefined') {
-                                    console.log("本地storage里没有内容");
-                                    updateGiteeGist([]);
-                                } else {
-                                    updateGiteeGist(callback);
-                                }
-                            })
-                        } else if (action === "pull_gitee") {
-                            getGiteeGistById();
-                        }
-                    }
-                } else {
-                    alert("获取所有gists时失败了");
-                    handleGistLog.push(`${chrome.i18n.getMessage("pullFailed")}`)
-                }
-            },
-            error: function (xhr, errorText, errorType) {
-                alert("获取所有gists时报错了");
-                handleGistLog.push(`${chrome.i18n.getMessage("pullFailed")}-->${xhr.responseText}`)
-            },
-            complete: function () {
-                //do something
             }
         })
     }
@@ -1461,34 +1088,6 @@ https://www.google.com | Google
         });
     }
 
-    // 判断是否已经保存gitee的Token
-    function isStoredGiteeTokenLocal(action) {
-        console.log("开始检查giteetoken有没有保存");
-        handleGistLog.push(`${chrome.i18n.getMessage("startCheckGiteeTokenSaved")}`);
-        if (action === "push_gitee") {
-            pushToGiteeGistStatus = `${chrome.i18n.getMessage("startCheckGiteeTokenSaved")}`;
-        } else if (action === "pull_gitee") {
-            pullFromGiteeGistStatus = `${chrome.i18n.getMessage("startCheckGiteeTokenSaved")}`;
-        }
-        chrome.storage.local.get("giteeGistToken", function (storage) {
-            console.log(storage.giteeGistToken);
-            if (storage.giteeGistToken) {
-                console.log("giteetoken有保存");
-                handleGistLog.push(`${chrome.i18n.getMessage("giteeTokenSaved")}`);
-                giteeGistToken = storage.giteeGistToken;
-                isStoredGiteeGistIdLocal(action);
-            } else {
-                console.log("giteetoken没有保存");
-                handleGistLog.push(`${chrome.i18n.getMessage("giteeTokenNoSaved")}`);
-                let token = prompt(`${chrome.i18n.getMessage("saveTokenKey")}`, `${chrome.i18n.getMessage("saveTokenValue")}`);
-                chrome.storage.local.set({giteeGistToken: token.trim()});
-                console.log("giteetoken保存完毕");
-                handleGistLog.push(`${chrome.i18n.getMessage("giteeTokenSaveSuccess")}`)
-                isStoredGiteeGistIdLocal(action);
-            }
-        });
-    }
-
     // 创建github的gist
     function createGithubGist(content) {
         console.log("还没有创建gist,开始创建");
@@ -1529,50 +1128,6 @@ https://www.google.com | Google
             }
         })
     }
-
-    // 创建gitee的gist
-    function createGiteeGist(content) {
-        console.log("还没有创建gist,开始创建");
-        handleGistLog.push(`${chrome.i18n.getMessage("startCreateGiteeGist")}`)
-        pushToGiteeGistStatus = `${chrome.i18n.getMessage("startCreateGiteeGist")}`;
-        let _content = JSON.stringify(content);
-        let data = {
-            "description": "myCloudSkyMonster", "public": false, "files": {
-                "brower_Tabs.json": {"content": _content}
-            }
-        }
-        $.ajax({
-            type: "POST",
-            headers: {"Authorization": "token " + giteeGistToken},
-            url: giteeApiUrl + "/gists",
-            dataType: "json",
-            data: data,
-            success: function (data, status) {
-                if (status === "success") {
-                    console.log("创建成功！");
-                    chrome.storage.local.set({
-                        "giteeGistId": data.id
-                    })
-                    handleGistLog.push(`${chrome.i18n.getMessage("createSuccess")}`)
-                } else {
-                    console.log("创建失败！");
-                    handleGistLog.push(`${chrome.i18n.getMessage("createFailed")}`)
-                }
-            },
-            error: function (xhr, errorText, errorType) {
-                console.log(xhr);
-                console.log(errorText);
-                console.log(errorType);
-                console.log("报错了！");
-                handleGistLog.push(`${chrome.i18n.getMessage("createFailed")}-->${xhr.responseText}`)
-            },
-            complete: function () {
-                //do something
-                pushToGiteeGistStatus = undefined;
-            }
-        })
-    }
-
     // 日期格式化
     function dateFormat(fmt, date) {
         let ret;
@@ -1658,8 +1213,6 @@ https://www.google.com | Google
             delete items.del_tabGroups_num
             delete items.gistLog
             delete items.handleGistStatus
-            delete items.giteeGistId
-            delete items.giteeGistToken
             delete items.githubGistId
             delete items.githubGistToken
             if (tabGroupsStr.length > 0) {
@@ -2246,9 +1799,6 @@ https://www.google.com | Google
             if (storage.githubGistToken) {
                 document.getElementById("githubToken").value = storage.githubGistToken
             }
-            if (storage.giteeGistToken) {
-                document.getElementById("giteeToken").value = storage.giteeGistToken
-            }
         });
         document.getElementById("options").innerHTML = `
             <div class="option">
@@ -2282,18 +1832,6 @@ https://www.google.com | Google
                 </div>
               </div>
             </div>
-            
-            <div class="form-group row">
-              <label for="password" class="col-sm-2 control-label">${chrome.i18n.getMessage("giteeToken")}:</label>
-              <div class="col-sm-5">
-                <div class="input-group">
-                  <input type="password" class="form-control" id="giteeToken" placeholder="${chrome.i18n.getMessage("input")}${chrome.i18n.getMessage("giteeToken")}">
-                  <div class="input-group-addon">
-                    <span class="glyphicon glyphicon-eye-open" id="changeEye2"></span>
-                  </div>
-                </div>
-              </div>
-            </div>
             <hr>
             <button id="save">${chrome.i18n.getMessage("saveButtonValue")}</button>
             <div id="saved">${chrome.i18n.getMessage("savedValue")}</div>
@@ -2313,12 +1851,12 @@ https://www.google.com | Google
             let deleteTabOnOpen = document.querySelector('input[name="deleteTabOnOpen"]:checked').value;
             let openBackgroundAfterSendTab = document.querySelector('input[name="openBackgroundAfterSendTab"]:checked').value;
             let githubGistToken = document.getElementById("githubToken").value
-            let giteeGistToken = document.getElementById("giteeToken").value
 
             chrome.storage.local.set({
                 options: {
                     deleteTabOnOpen: deleteTabOnOpen, openBackgroundAfterSendTab: openBackgroundAfterSendTab
-                }, githubGistToken: githubGistToken, giteeGistToken: giteeGistToken
+                },
+                githubGistToken: githubGistToken
             }, function () { // show "settings saved" notice thing
                 document.getElementById('saved').style.display = 'block';
                 window.setTimeout(function () {
@@ -2329,18 +1867,6 @@ https://www.google.com | Google
         document.getElementById('changeEye').addEventListener('click', function () {
             let passwordInput = document.getElementById("githubToken");
             let visibilityIcon = document.getElementById("changeEye");
-
-            if (passwordInput.type === "password") {
-                passwordInput.type = "text";
-                visibilityIcon.className = "glyphicon glyphicon-eye-close";
-            } else {
-                passwordInput.type = "password";
-                visibilityIcon.className = "glyphicon glyphicon-eye-open";
-            }
-        });
-        document.getElementById('changeEye2').addEventListener('click', function () {
-            let passwordInput = document.getElementById("giteeToken");
-            let visibilityIcon = document.getElementById("changeEye2");
 
             if (passwordInput.type === "password") {
                 passwordInput.type = "text";

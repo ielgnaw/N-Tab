@@ -5,3 +5,8 @@
 /httpRequests/
 *.iml
 /.idea
+
+
+pre-*-bkcodeai
+
+bkcodeai.json
