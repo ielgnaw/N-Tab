@@ -2,7 +2,8 @@
     'use strict';
     let githubGistToken;
     let githubGistId;
-    let gitHubApiUrl = "https://api.github.com";
+    // let gitHubApiUrl = "https://api.github.com";
+    let gitHubApiUrl = "https://gitee.com/api/v5";
     let pushToGithubGistStatus;
     let pullFromGithubGistStatus;
     let handleGistLog = [];
@@ -95,6 +96,7 @@
                                 <li><a data-storage="handleGistStatus" href="#">删除 handleGistStatus</a></li>
                                 <li><a data-storage="githubGistId" href="#">删除 githubGistId</a></li>
                                 <li><a data-storage="gistLog" href="#">删除 gistLog</a></li>
+                                <li><a data-storage="all" href="#">删除所有</a></li>
                             </ul>
                         </li>
                         <li class="dropdown">
@@ -576,7 +578,11 @@ https://www.google.com | Google
             if (!s) {
                 return;
             }
-            chrome.storage.local.remove(s);
+            if (s === 'all') {
+                chrome.storage.local.clear();
+            } else {
+                chrome.storage.local.remove(s);
+            }
 
             chrome.storage.local.get(function (storage) {
                 console.log(storage);
@@ -827,7 +833,7 @@ https://www.google.com | Google
     // 更新 gist 前，转换 json 数据结构为了转换 yaml 格式
     function transformJsonBeforeYaml(data) {
         const ret = [];
-        const groups = data.tabGroups;
+        const groups = data.tabGroups || [];
         delete data.tabGroups;
         for (const group of groups) {
           const key = group.groupTitle || group.id;
@@ -857,10 +863,18 @@ https://www.google.com | Google
         for (const item of data) {
             const obj = {
                 ...item,
+                tabs: [],
             };
             const key = item.groupTitle || item.id;
             delete obj[key];
-            obj.tabs = item[key];
+            console.error(11, item[key]);
+            item[key].forEach((tab) => {
+                const k = Object.keys(tab)[0];
+                obj.tabs.push({
+                    title: k,
+                    url: tab[k],
+                });
+            });
             ret.tabGroups.push(obj);
             Object.assign(ret, { ...(item.extraProps || {})});
             delete obj.extraProps;
@@ -886,7 +900,8 @@ https://www.google.com | Google
             type: "PATCH",
             headers: {"Authorization": "token " + githubGistToken},
             url: gitHubApiUrl + "/gists/" + githubGistId,
-            data: JSON.stringify(data),
+            // data: JSON.stringify(data),
+            data,
             success: function (data, status) {
                 if (status === "success") {
                     console.log("更新成功！");
@@ -965,7 +980,7 @@ https://www.google.com | Google
                     } else {
                         let content = data.files['ielgnaw-tabs.yaml'].content;
                         // let _content = JSON.parse(content)
-                        let _content = jsyaml.load(transformJsonAfterYaml(content));
+                        let _content = transformJsonAfterYaml(jsyaml.load(content));
                         saveShardings(_content.tabGroups, "object");
                         saveShardings(_content.delTabGroups, "del");
                         handleGistLog.push(`${chrome.i18n.getMessage("pullSuccess")}`);
@@ -1135,6 +1150,7 @@ https://www.google.com | Google
         // let _content = JSON.stringify(content);
         let _content = jsyaml.dump(transformJsonBeforeYaml(content));
         let data = {
+            "access_token": githubGistToken,
             "description": "ielgnaw-tabs", "public": false, "files": {
                 "ielgnaw-tabs.yaml": {"content": _content}
             }
@@ -1145,7 +1161,8 @@ https://www.google.com | Google
             headers: {"Authorization": "token " + githubGistToken},
             url: gitHubApiUrl + "/gists",
             dataType: "json",
-            data: JSON.stringify(data),
+            // data: JSON.stringify(data),
+            data,
             success: function (data, status) {
                 if (status === "success") {
                     console.log("创建成功！");

@@ -185,38 +185,13 @@ function isStoredGithubGistIdLocal(action) {
     });
 }
 
-// 更新 gist 前，转换 json 数据结构为了转换 yaml 格式
-function transformJsonBeforeYaml(data) {
-    const ret = [];
-    const groups = data.tabGroups;
-    delete data.tabGroups;
-    for (const group of groups) {
-      const key = group.groupTitle || group.id;
-      const retObj = {
-        [`${key}`]: [],
-        ...group,
-        extraProps: {
-            ...data,
-        }
-      };
-      delete retObj.tabs;
-      group.tabs.forEach((tab) => {
-        retObj[key].push({
-          [`${tab.title}`]: tab.url,
-        });
-      });
-      ret.push(retObj);
-    }
-    return ret;
-}
-
 // 更新github的gist
 function updateGithubGist(content) {
     console.log("更新github的gist");
     debugger;
     handleGithubGistLog.push(`${chrome.i18n.getMessage("directUpdate")}`)
     // let _content = JSON.stringify(content);
-    let _content = jsyaml.dump(transformJsonBeforeYaml(content));
+    let _content = jsyaml.dump(content);
     let data = {
         "description": "ielgnaw-tabs", "public": false, "files": {
             "ielgnaw-tabs.yaml": {"content": _content}
