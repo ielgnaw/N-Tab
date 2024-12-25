@@ -77,20 +77,11 @@
 	"dragTabs": {
 		"message": "是否拖曳标签"
 	},
-	"dragOpenTranslate": {
-		"message": "是否划词翻译"
-	},
 	"pushToGithubGist": {
 		"message": "推送到GitHub的gist"
 	},
 	"pullFromGithubGist": {
 		"message": "从GitHub的gist拉取"
-	},
-	"confirmKey": {
-		"message": "请输入\"确定\"表示确认："
-	},
-	"confirmValue": {
-		"message": "会覆盖的，小心谨慎思考这操作到底要不要！！！请输入\"确定\"表示确认"
 	},
 	"importToLocal": {
 		"message": "导入"

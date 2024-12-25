@@ -2,7 +2,8 @@ console.log("background is done!");
 
 // 引入需要的库
 importScripts("moment.min.js");
-importScripts("axios.min.js");
+// importScripts("axios.min.js");
+importScripts("js-yaml.min.js");
 
 let emojiReg = /[\uD83C|\uD83D|\uD83E][\uDC00-\uDFFF][\u200D|\uFE0F]|[\uD83C|\uD83D|\uD83E][\uDC00-\uDFFF]|[0-9|*|#]\uFE0F\u20E3|[0-9|#]\u20E3|[\u203C-\u3299]\uFE0F\u200D|[\u203C-\u3299]\uFE0F|[\u2122-\u2B55]|\u303D|[\A9|\AE]\u3030|\uA9|\uAE|\u3030/gi;
 let handleGithubGistLog = [];
@@ -184,14 +185,41 @@ function isStoredGithubGistIdLocal(action) {
     });
 }
 
+// 更新 gist 前，转换 json 数据结构为了转换 yaml 格式
+function transformJsonBeforeYaml(data) {
+    const ret = [];
+    const groups = data.tabGroups;
+    delete data.tabGroups;
+    for (const group of groups) {
+      const key = group.groupTitle || group.id;
+      const retObj = {
+        [`${key}`]: [],
+        ...group,
+        extraProps: {
+            ...data,
+        }
+      };
+      delete retObj.tabs;
+      group.tabs.forEach((tab) => {
+        retObj[key].push({
+          [`${tab.title}`]: tab.url,
+        });
+      });
+      ret.push(retObj);
+    }
+    return ret;
+}
+
 // 更新github的gist
 function updateGithubGist(content) {
-    console.log("更新github的gist")
+    console.log("更新github的gist");
+    debugger;
     handleGithubGistLog.push(`${chrome.i18n.getMessage("directUpdate")}`)
-    let _content = JSON.stringify(content);
+    // let _content = JSON.stringify(content);
+    let _content = jsyaml.dump(transformJsonBeforeYaml(content));
     let data = {
-        "description": "myCloudSkyMonster", "public": false, "files": {
-            "brower_Tabs.json": {"content": _content}
+        "description": "ielgnaw-tabs", "public": false, "files": {
+            "ielgnaw-tabs.yaml": {"content": _content}
         }
     }
     let myHeaders = new Headers();
@@ -265,62 +293,10 @@ function isEnglish(str) {
     return reg.test(str);
 }
 
-// 调用腾讯交互翻译api
-function translateFunc(txt) {
-    console.log("开始翻译！");
-    let source = "en"
-    let target = "zh"
-    if (isChinese(txt)) {
-        source = "zh"
-        target = "en"
-    }
-    if (isEnglish(txt)) {
-        source = "en"
-        target = "zh"
-    }
-    let url = "https://transmart.qq.com/api/imt"
-    let data = JSON.stringify({
-        "header": {
-            "fn": "auto_translation",
-            "session": "",
-            "client_key": "browser-chrome-117.0.0-Windows 10-4daf3e2e-b66e-43a1-944a-a8f6b42c9199-1696226243060",
-            "user": ""
-        }, "type": "plain", "model_category": "normal", "text_domain": "general", "source": {
-            "lang": source, "text_list": [txt]
-        }, "target": {
-            "lang": target
-        }
-    })
-    let myHeaders = new Headers();
-    myHeaders.append("Content-Type", "application/json");
-    let requestOptions = {
-        method: 'POST', headers: myHeaders, body: data,
-    };
-
-    fetch(url, requestOptions)
-        .then(response => response.json())
-        .then(result => {
-            console.log(result.header.ret_code)
-            if (result.header.ret_code) {
-                console.log(result.auto_translation[0]);
-                sendMessageToContentScript("translateResult", result.auto_translation[0]);
-            } else {
-                sendMessageToContentScript("translateResult", "--FAILED--!");
-            }
-        })
-        .catch(error => {
-            console.log('error', error)
-            sendMessageToContentScript("translateResult", "--ERROR,may be lost network--!");
-        });
-}
-
 // 持续监听发送给background的消息
 chrome.runtime.onMessage.addListener(function (req, sender, sendRes) {
+    console.error('reqreqreqreq', req);
     switch (req.action) {
-        case 'translate': // 翻译
-            translateFunc(req.message);
-            sendRes('ok'); // acknowledge
-            break;
         case 'save-all': // 保存所有tab
             if (req.tabsArr.length > 0) {
                 saveTabs(req.tabsArr);

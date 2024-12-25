@@ -6,19 +6,6 @@ let scrollLeft;
 let autoHideTimeout;
 
 document.addEventListener('DOMContentLoaded', function () {
-    // 鼠标划词（双击取词或者滑动取词）
-    $(document).mouseup(function (e) {
-        let txt = window.getSelection();
-        console.log(txt.toString())
-        if (txt.toString().trim().length > 0) {
-            chrome.storage.local.get('dragOpenTranslate', function (storage) {
-                if (storage.dragOpenTranslate) {
-                    sendMessageToBackground("translate", txt.toString());
-                }
-            });
-        }
-    });
-
     // 点击弹窗外部关闭弹窗
     $(document).click(function () {
         hidePopup();

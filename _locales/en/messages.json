@@ -77,20 +77,11 @@
 	"dragTabs": {
 		"message": "Super Drag Tabs"
 	},
-	"dragOpenTranslate": {
-		"message": "Cross Word Translation"
-	},
 	"pushToGithubGist": {
 		"message": "Push To GitHub's gist"
 	},
 	"pullFromGithubGist": {
 		"message": "Pull From GitHub's gist"
-	},
-	"confirmKey": {
-		"message": "Please input \"confirm\" to ensure: "
-	},
-	"confirmValue": {
-		"message": "Warn!!! It will be override, please deep think about it !!! Please input \"confirm\" to ensure"
 	},
 	"importToLocal": {
 		"message": "import to local"

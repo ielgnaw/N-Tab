@@ -22,8 +22,22 @@
     let isStateOne = true;
 
     document.addEventListener('DOMContentLoaded', function () {
-        debugger;
         console.log("load完workbench了");
+        // console.error(jsyaml.load('greeting: hello\nname: world'));
+        // chrome.storage.local.remove("githubGistId", function (...argds) {
+        //     console.error('storageargds', argds);
+        // });
+
+        // chrome.storage.local.clear(function (...args) {
+        //     console.error(args);
+        // });
+
+        chrome.storage.local.get(null, function (storage) {
+            // chrome.storage.local.remove('handleGistStatus');
+            // chrome.storage.local.remove('githubGistId');
+            // chrome.storage.local.remove('gistLog');
+            // console.error(storage);
+        });
 
         // 获取本机storage
         chrome.storage.local.get(function (storage) {
@@ -76,6 +90,15 @@
                         </li>
                         <li class="dropdown">
                             <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button"
+                                aria-haspopup="true" aria-expanded="false">删除 storage<span class="caret"></span></a>
+                            <ul id="delete-storage" class="dropdown-menu">
+                                <li><a data-storage="handleGistStatus" href="#">删除 handleGistStatus</a></li>
+                                <li><a data-storage="githubGistId" href="#">删除 githubGistId</a></li>
+                                <li><a data-storage="gistLog" href="#">删除 gistLog</a></li>
+                            </ul>
+                        </li>
+                        <li class="dropdown">
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button"
                                 aria-haspopup="true" aria-expanded="false">${chrome.i18n.getMessage("otherFunction")}<span class="caret"></span></a>
                             <ul id="others" class="dropdown-menu">
                                 <li id="showLog"><a href="#logs">${chrome.i18n.getMessage("showLog")}</a></li>
@@ -87,8 +110,6 @@
                                 <li role="separator" class="divider"></li>
                                 <li><a href="#">${chrome.i18n.getMessage("dragTitle")} <input id="dragTitle" data-size="mini" type="checkbox"></a></li>
                                 <li><a href="#">${chrome.i18n.getMessage("dragTabs")} <input id="dragUrls" data-size="mini" type="checkbox"></a></li>
-                                <li role="separator" class="divider"></li>
-                                <li><a href="#">${chrome.i18n.getMessage("dragOpenTranslate")} <input id="dragOpenTranslate" data-size="mini" type="checkbox"></a></li>
                             </ul>
                         </li>
                         <li>
@@ -320,39 +341,6 @@ https://www.google.com | Google
                     }
                 });
             }
-            // 处理是否划词翻译
-            let dragOpenTranslate = items.dragOpenTranslate
-            if (dragOpenTranslate) {
-                $('#dragOpenTranslate').bootstrapSwitch({
-                    state: true,
-                    onText: `${chrome.i18n.getMessage("yes")}`,
-                    offText: `${chrome.i18n.getMessage("no")}`,
-                    onColor: "success",
-                    offColor: "danger",
-                    onSwitchChange: function (event, state) {
-                        if (state === true) {
-                            chrome.storage.local.set({"dragOpenTranslate": true});
-                        } else {
-                            chrome.storage.local.set({"dragOpenTranslate": false});
-                        }
-                    }
-                });
-            } else {
-                $('#dragOpenTranslate').bootstrapSwitch({
-                    state: false,
-                    onText: `${chrome.i18n.getMessage("yes")}`,
-                    offText: `${chrome.i18n.getMessage("no")}`,
-                    onColor: "success",
-                    offColor: "danger",
-                    onSwitchChange: function (event, state) {
-                        if (state === true) {
-                            chrome.storage.local.set({"dragOpenTranslate": true});
-                        } else {
-                            chrome.storage.local.set({"dragOpenTranslate": false});
-                        }
-                    }
-                });
-            }
         });
 
         // 展示所有标签
@@ -524,77 +512,77 @@ https://www.google.com | Google
 
         // 响应推送到github的gist的动作
         document.getElementById('pushToGithubGist').addEventListener('click', function () {
-            let confirm = prompt(`${chrome.i18n.getMessage("confirmKey")}`, `${chrome.i18n.getMessage("confirmValue")}`);
-            if (confirm.trim() === "确定" || confirm.trim() === "confirm") {
-                console.log("yes");
-                chrome.storage.local.get(null, function (storage) {
-                    if (!storage.githubGistToken) {
-                        console.log("githubGistToken没有保存");
-                        showAlert(`${chrome.i18n.getMessage("showError")}`, `${chrome.i18n.getMessage("githubTokenNoSaved")}` + "\n" + `${chrome.i18n.getMessage("goToOptions")}`)
-                        return
-                    }
-                    console.log(storage.handleGistStatus);
-                    if (storage.handleGistStatus) {
-                        console.log("handleGistStatus有值");
-                        if (storage.handleGistStatus.type === "IDLE") {
+            debugger;
+            chrome.storage.local.get(null, function (storage) {
+                if (!storage.githubGistToken) {
+                    console.log("githubGistToken没有保存");
+                    showAlert(`${chrome.i18n.getMessage("showError")}`, `${chrome.i18n.getMessage("githubTokenNoSaved")}` + "\n" + `${chrome.i18n.getMessage("goToOptions")}`)
+                    return
+                }
+                console.log(storage.handleGistStatus);
+                if (storage.handleGistStatus) {
+                    console.log("handleGistStatus有值");
+                    if (storage.handleGistStatus.type === "IDLE") {
+                        pushToGithubGist();
+                    } else {
+                        let time = moment().format('YYYY-MM-DD HH:mm:ss');
+                        let expireTime = storage.handleGistStatus.expireTime;
+                        console.log(expireTime)
+                        if (time > expireTime) {
                             pushToGithubGist();
                         } else {
-                            let time = moment().format('YYYY-MM-DD HH:mm:ss');
-                            let expireTime = storage.handleGistStatus.expireTime;
-                            console.log(expireTime)
-                            if (time > expireTime) {
-                                pushToGithubGist();
-                            } else {
-                                alert(storage.handleGistStatus.type);
-                            }
+                            alert(storage.handleGistStatus.type);
                         }
-                    } else {
-                        console.log("handleGistStatus没有值，第一次");
-                        pushToGithubGist();
                     }
-                });
-            } else {
-                console.log("no");
-                showAlert(`${chrome.i18n.getMessage("showError")}`, `${chrome.i18n.getMessage("importTextareaTip")}`)
-            }
+                } else {
+                    console.log("handleGistStatus没有值，第一次");
+                    pushToGithubGist();
+                }
+            });
         });
 
         // 响应从github的gist拉取的动作
         document.getElementById('pullFromGithubGist').addEventListener('click', function () {
-            let confirm = prompt(`${chrome.i18n.getMessage("confirmKey")}`, `${chrome.i18n.getMessage("confirmValue")}`);
-            if (confirm.trim() === "确定" || confirm.trim() === "confirm") {
-                console.log("yes");
-                chrome.storage.local.get(null, function (storage) {
-                    if (!storage.githubGistToken) {
-                        console.log("githubGistToken没有保存");
-                        showAlert(`${chrome.i18n.getMessage("showError")}`, `${chrome.i18n.getMessage("githubTokenNoSaved")}` + "\n" + `${chrome.i18n.getMessage("goToOptions")}`)
-                        return
-                    }
-                    console.log(storage.handleGistStatus);
-                    if (storage.handleGistStatus) {
-                        console.log("handleGistStatus有值");
-                        if (storage.handleGistStatus.type === "IDLE") {
+            chrome.storage.local.get(null, function (storage) {
+                if (!storage.githubGistToken) {
+                    console.log("githubGistToken没有保存");
+                    showAlert(`${chrome.i18n.getMessage("showError")}`, `${chrome.i18n.getMessage("githubTokenNoSaved")}` + "\n" + `${chrome.i18n.getMessage("goToOptions")}`)
+                    return
+                }
+                console.log(storage.handleGistStatus);
+                if (storage.handleGistStatus) {
+                    console.log("handleGistStatus有值");
+                    if (storage.handleGistStatus.type === "IDLE") {
+                        pullFromGithubGist();
+                    } else {
+                        let time = moment().format('YYYY-MM-DD HH:mm:ss');
+                        let expireTime = storage.handleGistStatus.expireTime;
+                        console.log(expireTime)
+                        if (time > expireTime) {
                             pullFromGithubGist();
                         } else {
-                            let time = moment().format('YYYY-MM-DD HH:mm:ss');
-                            let expireTime = storage.handleGistStatus.expireTime;
-                            console.log(expireTime)
-                            if (time > expireTime) {
-                                pullFromGithubGist();
-                            } else {
-                                alert(storage.handleGistStatus.type);
-                            }
+                            alert(storage.handleGistStatus.type);
                         }
-                    } else {
-                        console.log("handleGistStatus没有值，第一次");
-                        pullFromGithubGist();
                     }
-                });
-            } else {
-                console.log("no");
-                showAlert(`${chrome.i18n.getMessage("showError")}`, `${chrome.i18n.getMessage("importTextareaTip")}`)
-            }
+                } else {
+                    console.log("handleGistStatus没有值，第一次");
+                    pullFromGithubGist();
+                }
+            });
         });
+
+        document.getElementById('delete-storage').addEventListener('click', function (e) {
+            const s = e.target.getAttribute('data-storage') || '';
+            if (!s) {
+                return;
+            }
+            chrome.storage.local.remove(s);
+
+            chrome.storage.local.get(function (storage) {
+                console.log(storage);
+            });
+        });
+
 
         // 持续监听通知框的按钮点击事件，点了就清除通知框
         chrome.notifications.onButtonClicked.addListener(function callback(notificationId, buttonIndex) {
@@ -836,17 +824,64 @@ https://www.google.com | Google
         });
     }
 
+    // 更新 gist 前，转换 json 数据结构为了转换 yaml 格式
+    function transformJsonBeforeYaml(data) {
+        const ret = [];
+        const groups = data.tabGroups;
+        delete data.tabGroups;
+        for (const group of groups) {
+          const key = group.groupTitle || group.id;
+          const retObj = {
+            [`${key}`]: [],
+            ...group,
+            extraProps: {
+                ...data,
+            }
+          };
+          delete retObj.tabs;
+          group.tabs.forEach((tab) => {
+            retObj[key].push({
+              [`${tab.title}`]: tab.url,
+            });
+          });
+          ret.push(retObj);
+        }
+        return ret;
+    }
+
+    // 从 gist 获取数据后，将获取到 yaml 转换成 json 后，再转换这个 json 格式
+    function transformJsonAfterYaml(data) {
+        const ret = {
+            tabGroups: [],
+        };
+        for (const item of data) {
+            const obj = {
+                ...item,
+            };
+            const key = item.groupTitle || item.id;
+            delete obj[key];
+            obj.tabs = item[key];
+            ret.tabGroups.push(obj);
+            Object.assign(ret, { ...(item.extraProps || {})});
+            delete obj.extraProps;
+            delete item.extraProps;
+        }
+        return ret;
+    }
+
     // 更新github的gist
     function updateGithubGist(content) {
         pushToGithubGistStatus = `${chrome.i18n.getMessage("directUpdate")}`;
         handleGistLog.push(`${chrome.i18n.getMessage("directUpdate")}`)
         console.log("已经创建了gist，直接开始更新");
-        let _content = JSON.stringify(content);
+        // let _content = JSON.stringify(content);
+        let _content = jsyaml.dump(transformJsonBeforeYaml(content));
         let data = {
-            "description": "myCloudSkyMonster", "public": false, "files": {
-                "brower_Tabs.json": {"content": _content}
+            "description": "ielgnaw-tabs", "public": false, "files": {
+                "ielgnaw-tabs.yaml": {"content": _content}
             }
         }
+        debugger;
         $.ajax({
             type: "PATCH",
             headers: {"Authorization": "token " + githubGistToken},
@@ -891,6 +926,7 @@ https://www.google.com | Google
                 handleGistLog.push(`${chrome.i18n.getMessage("gistIdSaved")}`)
                 githubGistId = storage.githubGistId;
                 if (action === "push_github") {
+                    debugger;
                     getShardings(function (callback) {
                         if (!callback || typeof callback == 'undefined') {
                             console.log("本地storage里没有内容");
@@ -915,19 +951,21 @@ https://www.google.com | Google
         console.log("根据gistId拉取gist");
         handleGistLog.push(`${chrome.i18n.getMessage("getGithubGistById")}`)
         pullFromGithubGistStatus = `${chrome.i18n.getMessage("getGithubGistById")}`;
+        debugger;
         $.ajax({
             type: "GET",
             headers: {"Authorization": "token " + githubGistToken},
             url: gitHubApiUrl + "/gists/" + githubGistId,
             success: function (data, status) {
                 if (status === "success") {
-                    if (data.files['brower_Tabs.json'].truncated) {
-                        let rawUrl = data.files['brower_Tabs.json'].raw_url;
+                    if (data.files['ielgnaw-tabs.yaml'].truncated) {
+                        let rawUrl = data.files['ielgnaw-tabs.yaml'].raw_url;
                         console.log(rawUrl)
                         getGithubGistByRawUrl(rawUrl);
                     } else {
-                        let content = data.files['brower_Tabs.json'].content
-                        let _content = JSON.parse(content)
+                        let content = data.files['ielgnaw-tabs.yaml'].content;
+                        // let _content = JSON.parse(content)
+                        let _content = jsyaml.load(transformJsonAfterYaml(content));
                         saveShardings(_content.tabGroups, "object");
                         saveShardings(_content.delTabGroups, "del");
                         handleGistLog.push(`${chrome.i18n.getMessage("pullSuccess")}`);
@@ -990,6 +1028,7 @@ https://www.google.com | Google
         } else if (action === "pull_github") {
             pullFromGithubGistStatus = `${chrome.i18n.getMessage("startCheckGistCreated")}`;
         }
+        debugger;
         $.ajax({
             type: "GET",
             headers: {"Authorization": "token " + githubGistToken},
@@ -1000,7 +1039,7 @@ https://www.google.com | Google
                     let i;
                     let flag;
                     for (i = 0; i < data.length; i += 1) {
-                        if (data[i].description === "myCloudSkyMonster") {
+                        if (data[i].description === "ielgnaw-tabs") {
                             console.log("已经创建了gist");
                             handleGistLog.push(`${chrome.i18n.getMessage("gistCreated")}`)
                             githubGistId = data[i].id;
@@ -1093,12 +1132,14 @@ https://www.google.com | Google
         console.log("还没有创建gist,开始创建");
         handleGistLog.push(`${chrome.i18n.getMessage("startCreateGithubGist")}`)
         pushToGithubGistStatus = `${chrome.i18n.getMessage("startCreateGithubGist")}`;
-        let _content = JSON.stringify(content);
+        // let _content = JSON.stringify(content);
+        let _content = jsyaml.dump(transformJsonBeforeYaml(content));
         let data = {
-            "description": "myCloudSkyMonster", "public": false, "files": {
-                "brower_Tabs.json": {"content": _content}
+            "description": "ielgnaw-tabs", "public": false, "files": {
+                "ielgnaw-tabs.yaml": {"content": _content}
             }
         }
+        debugger;
         $.ajax({
             type: "POST",
             headers: {"Authorization": "token " + githubGistToken},
@@ -1853,9 +1894,9 @@ https://www.google.com | Google
             let githubGistToken = document.getElementById("githubToken").value
 
             chrome.storage.local.set({
-                options: {
-                    deleteTabOnOpen: deleteTabOnOpen, openBackgroundAfterSendTab: openBackgroundAfterSendTab
-                },
+                // options: {
+                //     deleteTabOnOpen: deleteTabOnOpen, openBackgroundAfterSendTab: openBackgroundAfterSendTab
+                // },
                 githubGistToken: githubGistToken
             }, function () { // show "settings saved" notice thing
                 document.getElementById('saved').style.display = 'block';
